@@ -1,8 +1,9 @@
-/** 
- * raphael.pan-zoom plugin 0.1.0
- * Copyright (c) 2011 @author Juan S. Escobar
+/**
+ * raphael.pan-zoom plugin 0.2.0
+ * Copyright (c) 2012 @author Juan S. Escobar
+ * https://github.com/escobar5
  *
- * licensed under the MIT license 
+ * licensed under the MIT license
  */
 (function () {
 
@@ -44,17 +45,17 @@
         getCurrentZoom: function () {
             return this.currZoom;
         }
-    };
+    },
 
-    var PanZoom = function (el, options) {
-        var paper = el;
-        var container = paper.canvas.parentNode;
-        var me = this;
-        var settings = {};
-        var initialPos = { x: 0, y: 0 };
-        var deltaX = 0;
-        var deltaY = 0;
-
+    PanZoom = function (el, options) {
+        var paper = el,
+            container = paper.canvas.parentNode,
+            me = this,
+            settings = {},
+            initialPos = { x: 0, y: 0 },
+            deltaX = 0,
+            deltaY = 0,
+            mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 
         this.enabled = false;
         this.dragThreshold = 5;
@@ -72,6 +73,7 @@
         this.currPos = settings.initialPosition;
 
         repaint();
+
         container.onmousedown = function (e) {
             var evt = window.event || e;
             if (!me.enabled) return false;
@@ -92,24 +94,25 @@
             container.onmousemove = null;
         };
 
-        var mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
         if (container.attachEvent) //if IE (and Opera depending on user setting)
             container.attachEvent("on" + mousewheelevt, handleScroll);
         else if (container.addEventListener) //WC3 browsers
             container.addEventListener(mousewheelevt, handleScroll, false);
 
         function handleScroll(e) {
-            var evt = window.event || e;
             if (!me.enabled) return false;
-            var delta = evt.detail ? evt.detail : evt.wheelDelta * -1;
+            var evt = window.event || e,
+                delta = evt.detail ? evt.detail : evt.wheelDelta * -1,
+                zoomCenter = getRelativePosition(evt, container);
+
             if (delta < 0) delta = -1;
             else if (delta > 0) delta = 1;
-            var zoomCenter = getRelativePosition(evt, container);
+            
             applyZoom(delta, zoomCenter);
             if (evt.preventDefault) evt.preventDefault();
             else evt.returnValue = false;
             return false;
-        };
+        }
 
         function applyZoom(val, centerPoint) {
             if (!me.enabled) return false;
@@ -124,16 +127,15 @@
 
                 repaint();
             }
-        };
+        }
 
         this.applyZoom = applyZoom;
 
         function dragging(e) {
-            var evt = window.event || e;
-            var newWidth = paper.width * (1 - (me.currZoom * settings.zoomStep));
-            var newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep));
-
-            var newPoint = getRelativePosition(evt, container);
+            var evt = window.event || e,
+                newWidth = paper.width * (1 - (me.currZoom * settings.zoomStep)),
+                newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep)),
+                newPoint = getRelativePosition(evt, container);
 
             deltaX = (newWidth * (newPoint.x - initialPos.x) / paper.width) * -1;
             deltaY = (newHeight * (newPoint.y - initialPos.y) / paper.height) * -1;
@@ -144,14 +146,14 @@
             if (evt.preventDefault) evt.preventDefault();
             else evt.returnValue = false;
             return false;
-        };
+        }
 
         function repaint() {
             me.currPos.x = me.currPos.x + deltaX;
             me.currPos.y = me.currPos.y + deltaY;
 
-            var newWidth = paper.width * (1 - (me.currZoom * settings.zoomStep));
-            var newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep));
+            var newWidth = paper.width * (1 - (me.currZoom * settings.zoomStep)),
+                newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep));
 
             if (me.currPos.x < 0) me.currPos.x = 0;
             else if (me.currPos.x > (paper.width * me.currZoom * settings.zoomStep)) {
@@ -163,14 +165,13 @@
                 me.currPos.y = (paper.height * me.currZoom * settings.zoomStep);
             }
             paper.setViewBox(me.currPos.x, me.currPos.y, newWidth, newHeight);
-        };
-    }
+        }
+    };
 
     PanZoom.prototype = panZoomFunctions;
 
     function getRelativePosition(e, obj) {
-        var x;
-        var y;
+        var x,y, pos;
         if (e.pageX || e.pageY) {
             x = e.pageX;
             y = e.pageY;
@@ -179,10 +180,26 @@
             x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
             y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
-        x -= obj.offsetLeft;
-        y -= obj.offsetTop;
+
+        pos = findPos(obj);
+        x -= pos[0];
+        y -= pos[1];
 
         return { x: x, y: y };
+    }
+
+    function findPos(obj) {
+        var posX = obj.offsetLeft, posY = obj.offsetTop, posArray;
+        while (obj.offsetParent) {
+            if (obj == document.getElementsByTagName('body')[0]) { break; }
+            else {
+                posX = posX + obj.offsetParent.offsetLeft;
+                posY = posY + obj.offsetParent.offsetTop;
+                obj = obj.offsetParent;
+            }
+        }
+        posArray = [posX, posY];
+        return posArray;
     }
 
 })();

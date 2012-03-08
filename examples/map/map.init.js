@@ -15,7 +15,7 @@ jQuery(function ($) {
     };
 
 
-    var arr = new Array();
+    var arr = [];
 
     var overlay = r.rect(0, 0, r.width, r.height);
     overlay.attr({ fill: '#ffffff', 'fill-opacity': 0, "stroke-width": 0, stroke: '#FFFFFF' });
