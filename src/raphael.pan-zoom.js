@@ -105,8 +105,8 @@
                 delta = evt.detail ? evt.detail : evt.wheelDelta * -1,
                 zoomCenter = getRelativePosition(evt, container);
 
-            if (delta < 0) delta = -1;
-            else if (delta > 0) delta = 1;
+            if (delta > 0) delta = -1;
+            else if (delta < 0) delta = 1;
             
             applyZoom(delta, zoomCenter);
             if (evt.preventDefault) evt.preventDefault();
