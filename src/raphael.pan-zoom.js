@@ -120,7 +120,7 @@
             if (me.currZoom < settings.minZoom) me.currZoom = settings.minZoom;
             else if (me.currZoom > settings.maxZoom) me.currZoom = settings.maxZoom;
             else {
-                centerPoint = centerPoint || { x: 0, y: 0 };
+                centerPoint = centerPoint || { x: paper.width/2, y: paper.height/2 };
 
                 deltaX = ((paper.width * settings.zoomStep) * (centerPoint.x / paper.width)) * val;
                 deltaY = (paper.height * settings.zoomStep) * (centerPoint.y / paper.height) * val;
