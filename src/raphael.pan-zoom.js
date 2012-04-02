@@ -132,6 +132,7 @@
         this.applyZoom = applyZoom;
 
         function dragging(e) {
+            if (!me.enabled) return false;
             var evt = window.event || e,
                 newWidth = paper.width * (1 - (me.currZoom * settings.zoomStep)),
                 newHeight = paper.height * (1 - (me.currZoom * settings.zoomStep)),
