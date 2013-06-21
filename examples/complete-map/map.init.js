@@ -42,6 +42,10 @@ jQuery(function ($) {
         e.preventDefault();
     });
     
+    $("#others #moveTopLeft").click(function (e) {
+        panZoom.pan(1,1);
+    });
+    
 	function animateOver() {
         if (this.data("hoverFill")) {
             this.attr("fill", this.data("hoverFill"));

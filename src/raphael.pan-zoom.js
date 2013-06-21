@@ -61,7 +61,7 @@
         },
 
         pan: function (deltaX, deltaY) {
-            this.applyPan(deltaX, deltaY);
+            this.applyPan(deltaX * -1, deltaY * -1);
         },
 
         isDragging: function () {
