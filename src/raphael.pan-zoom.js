@@ -51,6 +51,14 @@
         disable: function () {
             this.enabled = false;
         },
+        
+        enablePan: function () {
+            this.panEnabled = true;
+        },
+
+        disablePan: function () {
+            this.panEnabled = false;
+        },
 
         zoomIn: function (steps) {
             this.applyZoom(steps);
@@ -88,6 +96,7 @@
                 mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 
             this.enabled = false;
+            this.panEnabled = false;
             this.dragThreshold = 5;
             this.dragTime = 0;
     
@@ -102,7 +111,7 @@
             this.currZoom = settings.initialZoom;
             this.currPos = settings.initialPosition;
             
-            function repaint() {
+            function repaint() { 
                 me.currPos.x = me.currPos.x + deltaX;
                 me.currPos.y = me.currPos.y + deltaY;
     
@@ -120,11 +129,12 @@
                 } else if (me.currPos.y > (paper.height * me.currZoom * settings.zoomStep)) {
                     me.currPos.y = (paper.height * me.currZoom * settings.zoomStep);
                 }
+                
                 paper.setViewBox(me.currPos.x, me.currPos.y, newWidth, newHeight);
             }
             
-            function dragging(e) {
-                if (!me.enabled) {
+            function dragging(e) { 
+                if (!me.enabled || !me.panEnabled) {
                     return false;
                 }
                 var evt = window.event || e,
@@ -135,7 +145,7 @@
                 deltaX = (newWidth * (newPoint.x - initialPos.x) / paper.width) * -1;
                 deltaY = (newHeight * (newPoint.y - initialPos.y) / paper.height) * -1;
                 initialPos = newPoint;
-    
+                
                 repaint();
                 me.dragTime += 1;
                 if (evt.preventDefault) {
@@ -224,6 +234,9 @@
             }
             
             function applyPan(dX, dY) {
+                if (!me.panEnabled) {
+                    return false;
+                }
                 deltaX = dX;
                 deltaY = dY;
                 repaint();
